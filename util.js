@@ -414,8 +414,8 @@ util.cache = [];
 	 * @settings 		-> string		className		class name given to active link
 	 *
 	 */
-	util.active_links = function(settings) {
-		
+util.active_links = function(settings) {
+
 		var options = {
 			url : null,
 			selector : $("body"),
@@ -424,44 +424,36 @@ util.cache = [];
 			className : 'active', 
 			exact : false
 		};
-		
+
 		$.extend(options, settings);
-		
-		var url = options.url ? options.url : util.get_url();
-		var currentURL = url.toString().split("/");
-		
+
+		var url 			 = options.url ? options.url : util.get_url();
+			url				 = url.replace("http://", ""), 
+			currentURL 		 = url.toString().split("/"), 
+			countWithoutHost = currentURL.length - 1; 
+
 		if(options.exact) {
-			
+
 			options.selector.find('a[href="' + url + '"]').each(function() {
 				var $this = $(this);
 				options.onBefore.call($(this), url, currentURL);
 				$this.addClass(options.className);
 				options.onAfter.call($(this), url, currentURL);
 			});
-			
-		} else {
 
-			var lastSeg = currentURL[currentURL.length-1];
-			switch(lastSeg) {
-				case "": 
-				case "/":
-					var $home_link = options.selector.find('a[href="/"]'); 
-					options.onBefore.call($home_link, url, currentURL);
-					$home_link.addClass(options.active);
-					options.onAfter.call($home_link, url, currentURL);
-				break;
-				default: 			
-					options.selector.find('a[href$="' + lastSeg + '"]').each(function() {
-						var $this = $(this);
-						options.onBefore.call($(this), url, currentURL);
-						$this.addClass(options.className);
-						options.onAfter.call($(this), url, currentURL);
-					});
-				break;
-			}
+		} else {
 			
+			var urlAppend = '';
+			for(i=0;i<countWithoutHost;i++) {
+				urlAppend += "/" + currentURL[i + 1];
+				options.onBefore.call($(this), url, currentURL);
+				selector = 'a[href$="' + urlAppend  + '"]';
+				console.log(selector);
+				$(selector).addClass(options.className);
+			}
+
 		}
-	
+
 	};
 
 	/*
